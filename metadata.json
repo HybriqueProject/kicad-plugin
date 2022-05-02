@@ -26,9 +26,6 @@
          "version":          "1.0.0",
     	   "status":          "stable",
     	   "kicad_version":   "6.0.2",
-    	   "download_sha256":  "82bc973ab3b724470e9c196b263ab0c8e15d6c73d71b3889f51f93095b0b9e69",
-    	   "download_size":    9150,
-    	   "download_url":    "https://github.com/HybriqueProject/kicad-plugin/archive/refs/tags/v1.0.0.zip",
          "install_size":     26400
        
    }

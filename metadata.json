@@ -14,7 +14,7 @@
 
    "mantainer":{
 
-   	    "name": "hybrique",
+   	    "name":      "hybrique",
    	    "contact":   "hybrique.sg@gmail.com"
    },
 
@@ -26,10 +26,10 @@
     	"version":          "1.0.0",
     	"status":          "stable",
     	"kicad_version":   "6.0.2",
-    	"download_sha256":  "0f12ded7d4ac4949c633aad739e83f4130776b602ee4f3448af62823ac19a863 ",
-    	"download_size":    12288,
-    	"download_url":    "https://github.com/HybriqueProject/kicad-plugin/archive/refs/heads/main.zip",
-         "install_size":    16384 
+    	"download_sha256":  "f6c0804f3d91b3d604bfc543e93b782d2d64270fcf20960b826460bec3a96cf2",
+    	"download_size":    9138,
+    	"download_url":    "https://github.com/HybriqueProject/kicad-plugin/archive/refs/tags/v1.0.0.zip",
+      "install_size":     30500
        
      }
 

@@ -1,0 +1,44 @@
+{
+   
+   "$schema":       "https://go.kicad.org/pcm/schemas/v1",
+   "name":          "Hybrique Plugin",  
+   "description":   "Plugin  for finding suitable   manufacturers of different electronics components",
+   "description_full": " Very easy and useful plugin which help user to find exact match of manufacturers along with their price .Plugin can be called from the kicad by just designing schema",
+   "identifier":      "com.github.HybriqueProject.kicad-plugin",
+   "type":          "plugin",
+   "author":    {
+
+   	   "name":   "hybrique",
+   	   "contact": "hybrique.sg@gmail.com"
+   },
+
+   "mantainer":{
+
+   	    "name": "hybrique",
+   	    "contact":   "hybrique.sg@gmail.com"
+   },
+
+   "license":  "public-domain",
+    
+    
+    
+
+    	"version":          "1.0.0",
+    	"status":          "stable",
+    	"kicad_version":   "6.0.2",
+    	"download_sha256":  "0f12ded7d4ac4949c633aad739e83f4130776b602ee4f3448af62823ac19a863 ",
+    	"download_size":    12288,
+    	"download_url":    "https://github.com/HybriqueProject/kicad-plugin/archive/refs/heads/main.zip",
+         "install_size":    16384 
+       
+     }
+
+       ]
+
+ 
+
+
+
+
+
+}

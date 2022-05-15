@@ -1,23 +1,9 @@
-import re
-import datetime
-import sys
-import io
-import json
-import requests
 import pcbnew
-import json
 import os
+import platform
+import json
 import xml.etree.ElementTree as ET
-
-# from urllib import urlencode
-# import urllib2
-
-# def http_post(url, data):
-#     post = urlencode(data)
-#     req = urllib2.Request(url, post)
-#     response = urllib2.urlopen(req)
-#     return response.read()
-
+import subprocess
 
 class Hybrique(pcbnew.ActionPlugin):
     def __init__(self):
@@ -27,7 +13,7 @@ class Hybrique(pcbnew.ActionPlugin):
         self.pcbnew_icon_support = hasattr(self, "show_toolbar_button")
         self.show_toolbar_button = True
         self.icon_file_name = os.path.join(
-            os.path.dirname(__file__), "logo.png")
+            os.path.dirname(__file__), "icon.png")
         self.description = "Search for parts online"
 
     def defaults(self):
@@ -35,21 +21,23 @@ class Hybrique(pcbnew.ActionPlugin):
         self.category = "Read PCB"
         self.description = "Search for parts online"
 
-    # Function for issues in tab2
-
     def Run(self):
 
         board = pcbnew.GetBoard()
         pcb_file_name = board.GetFileName()
-        modules = board.GetModules()
+        try:
+            modules = board.GetFootprints()
+        except:
+            modules = board.GetModules()
 
-        fileName = ""
-        for i in range(len(pcb_file_name)-1, -1, -1):
-            if(pcb_file_name[i] == '/'):
-                break
-            else:
-                fileName = pcb_file_name[i] + fileName
-
+        SYSTEM_PLATFORM = platform.system()
+        if SYSTEM_PLATFORM == 'Windows':
+            fileName = pcb_file_name.split('\\')[-1]
+        elif SYSTEM_PLATFORM == "Linux":
+            fileName = pcb_file_name.split('/')[-1]
+        else:
+            fileName = pcb_file_name.split('/')[-1]
+        
         idx = 0
         index = 0
         dictInfo = []
@@ -136,43 +124,59 @@ class Hybrique(pcbnew.ActionPlugin):
         dataSend["data"] = dataOrder
 
         # Create Hybrique dir if do not exist
-        hybriqueDirPath = os.path.join(
-            os.path.expanduser('~\AppData\Local'), 'Hybrique')
-        if not os.path.isdir(hybriqueDirPath):
-            os.makedirs(hybriqueDirPath)
+        HYBRIQUE_DIR_PATH = os.path.join(os.path.expanduser('~\AppData\Local'), 'Hybrique')
+        if not os.path.isdir(HYBRIQUE_DIR_PATH):
+            os.makedirs(HYBRIQUE_DIR_PATH)
 
-        with open(os.path.join(os.path.expanduser('~\AppData\Local'), 'Hybrique', '_temp.json'), 'w') as f:
+        with open(os.path.join(HYBRIQUE_DIR_PATH, '_temp.json'), 'w') as f:
             json.dump(dataSend, f)
 
-        path = os.path.join(os.path.expanduser(
-            '~\AppData\Local\Hybrique'), 'plugins.xml')
+        PLUGINS_XML_PATH = os.path.join(HYBRIQUE_DIR_PATH, 'plugins.xml')
         try:
-            tree = ET.parse(path)
+            tree = ET.parse(PLUGINS_XML_PATH)
             root = tree.getroot()
             app_tag = root.find("meta").find("app")
             exePath = app_tag.attrib["path"]
+            runCmd = '"'+str(exePath)+'"' + " -p"
 
             # Launching the application
-            os.system('"'+str(exePath)+'"' + " -p")
+            CREATE_NO_WINDOW = 0x08000000
+            subprocess.call(runCmd, creationflags=CREATE_NO_WINDOW)
         except:
             # Create plugin.xml file inside hybrique dir
-            PLUGINS_XML_PATH = os.path.join(hybriqueDirPath, 'plugins.xml')
             if not os.path.isfile(PLUGINS_XML_PATH):
                 with open(PLUGINS_XML_PATH, 'w') as f:
-                    f.write(
-                        '<?xml version="1.0"?><root><plugins><kicad/></plugins></root>')
+                    f.write('<?xml version="1.0"?><root><plugins><kicad/></plugins></root>')
 
             # Show popup to download plugin
-            import Tkinter
-            import tkMessageBox
-            master = Tkinter.Tk()
-            master.withdraw()
-            res = tkMessageBox.askokcancel(
-                'App not found!', 'Please download and install the plugin!')
-            if res == True:
-                # Open web browser
-                import webbrowser
-                webbrowser.open_new_tab("https://www.hybrique.com/product")
+            HYBRIQUE_PRODUCT_PAGE = "https://www.hybrique.com/product"
+            try:
+                # python 3 - for kicad >= 6.0
+                import wx
+                wixApp = wx.App()
+                dlg = wx.MessageDialog(parent=None, message='Please download and install the plugin!', caption='App not found!', style=wx.OK | wx.CANCEL | wx.CENTRE | wx.ICON_EXCLAMATION)
+                retCode = dlg.ShowModal()
+                if (retCode == wx.ID_OK):
+                    import webbrowser
+                    webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
+                else:
+                    pass
+                # dlg.Destroy()
+                # wixApp.Destroy()
 
+            except ModuleNotFoundError:
+                # python 2 - kicad < 6.0
+                import Tkinter
+                import tkMessageBox
+                master = Tkinter.Tk()
+                master.withdraw()
+                res = tkMessageBox.askokcancel(
+                    'App not found!', 'Please download and install the plugin!')
+                if res == True:
+                    # Open web browser
+                    import webbrowser
+                    webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
+            except:
+                pass
 
 Hybrique().register()

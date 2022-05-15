@@ -4,6 +4,8 @@ import platform
 import json
 import xml.etree.ElementTree as ET
 import subprocess
+import wx
+import webbrowser
 
 class Hybrique(pcbnew.ActionPlugin):
     def __init__(self):
@@ -123,8 +125,15 @@ class Hybrique(pcbnew.ActionPlugin):
 
         dataSend["data"] = dataOrder
 
+        if SYSTEM_PLATFORM == 'Windows':
+            HYBRIQUE_DIR_PATH = os.path.join(os.path.expanduser('~\AppData\Local'), 'Hybrique')
+        elif SYSTEM_PLATFORM == "Linux":
+            HYBRIQUE_DIR_PATH = os.path.expanduser('~/.hybrique')
+        elif SYSTEM_PLATFORM == "Darwin":
+            HYBRIQUE_DIR_PATH = os.path.expanduser('~/.hybrique')
+
         # Create Hybrique dir if do not exist
-        HYBRIQUE_DIR_PATH = os.path.join(os.path.expanduser('~\AppData\Local'), 'Hybrique')
+        
         if not os.path.isdir(HYBRIQUE_DIR_PATH):
             os.makedirs(HYBRIQUE_DIR_PATH)
 
@@ -137,11 +146,19 @@ class Hybrique(pcbnew.ActionPlugin):
             root = tree.getroot()
             app_tag = root.find("meta").find("app")
             exePath = app_tag.attrib["path"]
-            runCmd = '"'+str(exePath)+'"' + " -p"
-
+            
             # Launching the application
-            CREATE_NO_WINDOW = 0x08000000
-            subprocess.call(runCmd, creationflags=CREATE_NO_WINDOW)
+            if SYSTEM_PLATFORM == 'Windows':
+                runCmd = '"'+str(exePath)+'"' + " -p"
+                CREATE_NO_WINDOW = 0x08000000
+                subprocess.call(runCmd, creationflags=CREATE_NO_WINDOW)
+            elif SYSTEM_PLATFORM == "Linux":
+                runCmd = "hybrique -p"
+                os.system(runCmd)
+            elif SYSTEM_PLATFORM == "Darwin":
+                runCmd = "hybrique -p"        
+                os.system(runCmd)
+
         except:
             # Create plugin.xml file inside hybrique dir
             if not os.path.isfile(PLUGINS_XML_PATH):
@@ -150,33 +167,16 @@ class Hybrique(pcbnew.ActionPlugin):
 
             # Show popup to download plugin
             HYBRIQUE_PRODUCT_PAGE = "https://www.hybrique.com/product"
-            try:
-                # python 3 - for kicad >= 6.0
-                import wx
-                wixApp = wx.App()
-                dlg = wx.MessageDialog(parent=None, message='Please download and install the plugin!', caption='App not found!', style=wx.OK | wx.CANCEL | wx.CENTRE | wx.ICON_EXCLAMATION)
-                retCode = dlg.ShowModal()
-                if (retCode == wx.ID_OK):
-                    import webbrowser
-                    webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
-                else:
-                    pass
-                # dlg.Destroy()
-                # wixApp.Destroy()
-
-            except ModuleNotFoundError:
-                # python 2 - kicad < 6.0
-                import Tkinter
-                import tkMessageBox
-                master = Tkinter.Tk()
-                master.withdraw()
-                res = tkMessageBox.askokcancel(
-                    'App not found!', 'Please download and install the plugin!')
-                if res == True:
-                    # Open web browser
-                    import webbrowser
-                    webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
-            except:
+            
+            wixApp = wx.App()
+            dlg = wx.MessageDialog(parent=None, message='Please download and install the plugin!', caption='App not found!', style=wx.OK | wx.CANCEL | wx.CENTRE | wx.ICON_EXCLAMATION)
+            retCode = dlg.ShowModal()
+            if (retCode == wx.ID_OK):
+                webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
+            elif (retCode == wx.ID_CANCEL):
                 pass
+            # dlg.Destroy()
+            # wixApp.Destroy()
+            
 
 Hybrique().register()

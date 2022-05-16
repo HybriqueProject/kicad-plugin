@@ -1,11 +1,10 @@
 import pcbnew
 import os
+import sys
 import platform
 import json
 import xml.etree.ElementTree as ET
 import subprocess
-import wx
-import webbrowser
 
 class Hybrique(pcbnew.ActionPlugin):
     def __init__(self):
@@ -167,15 +166,48 @@ class Hybrique(pcbnew.ActionPlugin):
             # Show popup to download plugin
             HYBRIQUE_PRODUCT_PAGE = "https://www.hybrique.com/product"
             
-            wixApp = wx.App()
-            dlg = wx.MessageDialog(parent=None, message='Please download and install the plugin!', caption='App not found!', style=wx.OK | wx.CANCEL | wx.CENTRE | wx.ICON_EXCLAMATION)
-            retCode = dlg.ShowModal()
-            if (retCode == wx.ID_OK):
-                webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
-            elif (retCode == wx.ID_CANCEL):
-                pass
-            # dlg.Destroy()
-            # wixApp.Destroy()
+            import webbrowser
+            if SYSTEM_PLATFORM == 'Windows':
+                import ctypes
+                STYLE_YESNO = 0x04
+                ICON_EXLAIM=0x30
+                result = ctypes.windll.user32.MessageBoxW(0, "Please download and install the standalone plugin!\nDo you want to proceed to the webpage ?", "App not found!", STYLE_YESNO | ICON_EXLAIM)
+                if (result == 6):
+                    webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
+                elif (result == 7):
+                    pass
+            elif SYSTEM_PLATFORM == "Darwin":
+                import wx
+                wixApp = wx.App()
+                dlg = wx.MessageDialog(parent=None, message='Please download and install the standalone plugin!\nDo you want to proceed to the webpage ?', caption='App not found!', style=wx.YES | wx.NO | wx.CENTRE | wx.ICON_EXCLAMATION)
+                result = dlg.ShowModal()
+                if (result == wx.ID_YES):
+                    webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
+                elif (result == wx.ID_NO):
+                    pass
+                dlg.Destroy()
+                wixApp.Destroy()
+            elif SYSTEM_PLATFORM == "Linux":
+                if sys.version_info[0] == 3:
+                    from tkinter import Tk, messagebox
+                    root = Tk()
+                    result = messagebox.askyesno(title='App not found!', message='Please download and install the standalone plugin!\nDo you want to proceed to the webpage ?')
+                    if (result == True):
+                        webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
+                    else:
+                        pass
+                    root.mainloop()
+                elif sys.version_info[0] == 2:
+                    import Tkinter
+                    import tkMessageBox
+                    master = Tkinter.Tk()
+                    master.withdraw()
+                    res = tkMessageBox.askokcancel(
+                        'App not found!', 'Please download and install the plugin!')
+                    if res == True:
+                        # Open web browser
+                        import webbrowser
+                        webbrowser.open_new_tab("https://www.hybrique.com/product")
             
 
 Hybrique().register()

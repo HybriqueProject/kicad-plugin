@@ -33,12 +33,11 @@ class Hybrique(pcbnew.ActionPlugin):
             modules = board.GetModules()
 
         SYSTEM_PLATFORM = platform.system()
+
+        fileName = pcb_file_name.split('/')[-1]
+
         if SYSTEM_PLATFORM == 'Windows':
-            fileName = pcb_file_name.split('\\')[-1]
-        elif SYSTEM_PLATFORM == "Linux":
-            fileName = pcb_file_name.split('/')[-1]
-        else:
-            fileName = pcb_file_name.split('/')[-1]
+            fileName = fileName.split('\\')[-1]
         
         idx = 0
         index = 0

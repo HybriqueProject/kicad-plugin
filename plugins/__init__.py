@@ -169,13 +169,10 @@ class Hybrique(pcbnew.ActionPlugin):
             import webbrowser
             if SYSTEM_PLATFORM == 'Windows':
                 import ctypes
-
                 STYLE_YESNO = 0x04
-                WS_EX_TOPMOST = 0x40000
+                STYLE_TOPMOST = 0x40000
                 ICON_EXLAIM=0x30
-
-                result = ctypes.windll.user32.MessageBoxA(0, "Please download and install the standalone plugin!\nDo you want to proceed to the webpage ?", "App not found!", STYLE_YESNO | WS_EX_TOPMOST | ICON_EXLAIM)
-
+                result = ctypes.windll.user32.MessageBoxW(0, u"Please download and install the standalone plugin!\nDo you want to proceed to the webpage ?", u"App not found!", STYLE_YESNO | STYLE_TOPMOST | ICON_EXLAIM)
                 if (result == 6):
                     webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
                 else:

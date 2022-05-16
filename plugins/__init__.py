@@ -188,26 +188,10 @@ class Hybrique(pcbnew.ActionPlugin):
                 dlg.Destroy()
                 wixApp.Destroy()
             elif SYSTEM_PLATFORM == "Linux":
-                if sys.version_info[0] == 3:
-                    from tkinter import Tk, messagebox
-                    root = Tk()
-                    result = messagebox.askyesno(title='App not found!', message='Please download and install the standalone plugin!\nDo you want to proceed to the webpage ?')
-                    if (result == True):
-                        webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
-                    else:
-                        pass
-                    root.mainloop()
-                elif sys.version_info[0] == 2:
-                    import Tkinter
-                    import tkMessageBox
-                    master = Tkinter.Tk()
-                    master.withdraw()
-                    res = tkMessageBox.askokcancel(
-                        'App not found!', 'Please download and install the plugin!')
-                    if res == True:
-                        # Open web browser
-                        import webbrowser
-                        webbrowser.open_new_tab("https://www.hybrique.com/product")
-            
+                try:
+                    subprocess.check_output(['zenity', '--question', '--width=350', '--title=App not found!', '--text=Please download and install the standalone plugin!\nDo you want to proceed to the webpage ?'])
+                    webbrowser.open_new_tab(HYBRIQUE_PRODUCT_PAGE)
+                except subprocess.CalledProcessError:
+                    pass
 
 Hybrique().register()

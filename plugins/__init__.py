@@ -27,8 +27,10 @@ class Hybrique(pcbnew.ActionPlugin):
         board = pcbnew.GetBoard()
         pcb_file_name = board.GetFileName()
         try:
+            # KiCad >= 6.0
             modules = board.GetFootprints()
         except:
+            # KiCad <= 5.1
             modules = board.GetModules()
 
         SYSTEM_PLATFORM = platform.system()
